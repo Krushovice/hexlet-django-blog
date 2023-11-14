@@ -34,7 +34,33 @@ class ArticleFormCreateView(View):
         if form.is_valid():
             messages.success(request, 'Article was added')
             form.save()
-            return redirect('index')
+            return redirect('articles_index')
 
         messages.error(request, 'Article can"t be added.Check title or body')
         return render(request, 'articles/create.html', {'form': form})
+
+
+class ArticleFormEditView(View):
+    def get(self, request, *args, **kwargs):
+        article_id = kwargs.get('id')
+        article = Article.objects.get(id=article_id)
+        form = ArticleForm(instance=article)
+        return render(request, 'articles/update.html', {
+            'form': form,
+            'article_id': article_id
+            })
+
+    def post(self, request, *args, **kwargs):
+        article_id = kwargs.get('id')
+        article = Article.objects.get(id=article_id)
+        form = ArticleForm(request.POST, instance=article)
+        if form.is_valid():
+            messages.success(request, 'Article edited successfully')
+            form.save()
+            return redirect('articles_index')
+
+        messages.error(request, 'Article can"t be edit. Something was wrong')
+        return render(request, 'articles/update.html', {
+            'form': form,
+            'article_id': article_id
+            })
